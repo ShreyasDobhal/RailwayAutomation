@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/RailwayAutomation/static/css/main.68ae4203.chunk.css",
-    "main.js": "/RailwayAutomation/static/js/main.bfb4630d.chunk.js",
-    "main.js.map": "/RailwayAutomation/static/js/main.bfb4630d.chunk.js.map",
+    "main.js": "/RailwayAutomation/static/js/main.bfa9d751.chunk.js",
+    "main.js.map": "/RailwayAutomation/static/js/main.bfa9d751.chunk.js.map",
     "runtime-main.js": "/RailwayAutomation/static/js/runtime-main.d4a2c29c.js",
     "runtime-main.js.map": "/RailwayAutomation/static/js/runtime-main.d4a2c29c.js.map",
     "static/js/2.88508a90.chunk.js": "/RailwayAutomation/static/js/2.88508a90.chunk.js",
@@ -17,6 +17,6 @@
     "static/js/runtime-main.d4a2c29c.js",
     "static/js/2.88508a90.chunk.js",
     "static/css/main.68ae4203.chunk.css",
-    "static/js/main.bfb4630d.chunk.js"
+    "static/js/main.bfa9d751.chunk.js"
   ]
 }
