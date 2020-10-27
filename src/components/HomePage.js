@@ -24,8 +24,6 @@ class HomePage extends Component {
         this.typeaheadRef = React.createRef();
     }
 
-    
-
     onFileUploadHandler = (event)=> {
         this.handleDrop(event.target.files);
     }
@@ -151,9 +149,9 @@ class HomePage extends Component {
                     sheet.eachRow({ includeEmpty: true }, (rowData, rowNumber) => {
                         if (rowNumber > 6) {
                             let row = rowData.values;
-                            if (row[7] == stationCode) {
+                            if (row[7] === stationCode) {
                                 for (let col=0; col<19; col++) {
-                                    if (col==0) {
+                                    if (col===0) {
                                         worksheet.getCell(String.fromCharCode(65+col)+(SN+2)).value = SN;
                                     } else {
                                         worksheet.getCell(String.fromCharCode(65+col)+(SN+2)).value = this.getCellData(row, col);
@@ -165,7 +163,7 @@ class HomePage extends Component {
                     });
 
                     // No data found
-                    if (SN==1) {
+                    if (SN===1) {
                         worksheet.mergeCells('A3:S3');
                         worksheet.getCell('A3').value = emptyMessage;
                         worksheet.getCell('A3').alignment = { horizontal:'center'};
@@ -207,7 +205,7 @@ class HomePage extends Component {
         if (!dates)
             return;
         
-        let dateArray = dates.split('');
+        let dateArray = dates.split(' ');
         let stationDates = [];
         for (let i=0;i<dateArray.length;i++) {
             let stationDate = dateArray[i].trim();
@@ -230,12 +228,11 @@ class HomePage extends Component {
             return;
         }
 
-        this.setState({loading: false});
+        this.setState({loading: true});
         this.createWorkbook();
     }
 
     render() {
-
 
         const options = [
             { label: 'BALAMAU', value: 'BLM' },
@@ -278,7 +275,6 @@ class HomePage extends Component {
             { label: 'AMROHA', value: 'AMRO' }
         ];
 
-
         return (
             <DragAndDrop handleDrop={this.handleDrop}>
                 <div className='page-container'>
@@ -287,25 +283,24 @@ class HomePage extends Component {
                         <Spinner animation="border" role="status" style={{ width: '3rem', height: '3rem' }}>
                             <span className="sr-only">Loading...</span>
                         </Spinner>
-                    ) : 
-                        this.state.inputFile ? (
-                            <div className='container'>
-                                <p>{this.state.inputFile.name}</p>
-                                <input className='input-field' type='text' placeholder='Enter train number' onChange={(event) => {this.setState({trainNumber: event.target.value})}}/>
-                                <Select ref={this.typeaheadRef} options={options} isMulti className='input-typeahead' onChange={this.stationsChangeHandler}/>
-                                <input className='input-field' type='text' placeholder='Enter arrival dates eg. 26.10.2020, 27.10.2020' onChange={this.dateChangeHandler}/>
-                                <div className='upload-btn-container'>
-                                    <button className='upload-btn' onClick={this.submitHandler}>Submit</button>
-                                </div>
+                    ) : null}
+
+                    {this.state.inputFile ? (
+                        <div className='container'>
+                            <p>{this.state.inputFile.name}</p>
+                            <input className='input-field' type='text' placeholder='Enter train number' onChange={(event) => {this.setState({trainNumber: event.target.value})}}/>
+                            <Select ref={this.typeaheadRef} options={options} isMulti className='input-typeahead' onChange={this.stationsChangeHandler}/>
+                            <input className='input-field' type='text' placeholder='Enter arrival dates eg. 26.10.2020, 27.10.2020' onChange={this.dateChangeHandler}/>
+                            <div className='upload-btn-container'>
+                                <button className='upload-btn' onClick={this.submitHandler}>Submit</button>
                             </div>
-                        ) : (
-                            <div>
-                                <label htmlFor='fileUpload' className='upload-btn'>Upload a file</label>
-                                <input id='fileUpload' className='upload-input' type='file' onChange={this.onFileUploadHandler} multiple/>
-                            </div>
-                        )
-                    }
-                    
+                        </div>
+                    ) : (
+                        <div>
+                            <label htmlFor='fileUpload' className='upload-btn'>Upload a file</label>
+                            <input id='fileUpload' className='upload-input' type='file' onChange={this.onFileUploadHandler} multiple/>
+                        </div>
+                    )}
                 </div>
             </DragAndDrop>
             
