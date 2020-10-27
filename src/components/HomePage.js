@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import DragAndDrop from './DragAndDrop';
 import Select from 'react-select'
-import TypeAhead from './TypeAhead';
+import { Spinner } from 'reactstrap';
 
 const ExcelJS = require('exceljs');
 var FileSaver = require('file-saver');
@@ -16,15 +16,7 @@ class HomePage extends Component {
         stationCodes: [],
         stationDates: [],
 
-        // inputFile: {
-        //     name: 'Sample file.xlsx'
-        // },
-        
-        // trainNumber: '02392',
-        // stationNames: ['MORADABAD'],
-        // stationCodes: ['MB'],
-        // stationDates: ['26.10.2020'],
-
+        loading: false
     }
 
     constructor(props) {
@@ -182,8 +174,14 @@ class HomePage extends Component {
 
                 // Saving file
                 outputWorkbook.xlsx.writeBuffer()
-                    .then(buffer => FileSaver.saveAs(new Blob([buffer]), outputFile))
-                    .catch(err => console.log('Error writing excel export', err));
+                    .then(buffer => {
+                        FileSaver.saveAs(new Blob([buffer]), outputFile);
+                        this.setState({loading: false});
+                    })
+                    .catch(err => {
+                        console.log('Error writing excel export', err);
+                        alert('Failed to create the report');
+                    });
                 
             });
         }
@@ -221,16 +219,18 @@ class HomePage extends Component {
     }
 
     submitHandler = () => {
-        // const node = this.typeaheadRef.current;
-        // console.log(node.value);
 
         if (!this.state.trainNumber || this.state.trainNumber === '' ||
             !this.state.stationNames || this.state.stationNames === [] ||
             !this.state.stationDates || this.state.stationDates === []) {
             alert('Enter valid details');
             return;
+        } else if (this.state.stationCodes.length !== this.state.stationDates.length) {
+            alert("Number of dates and stations doesn't match");
+            return;
         }
 
+        this.setState({loading: false});
         this.createWorkbook();
     }
 
@@ -276,28 +276,36 @@ class HomePage extends Component {
             { label: 'PILKHUWA', value: 'PKW' },
             { label: 'HAPUR', value: 'HPU' },
             { label: 'AMROHA', value: 'AMRO' }
-        ]
+        ];
+
 
         return (
             <DragAndDrop handleDrop={this.handleDrop}>
                 <div className='page-container'>
                     <img src='excel.png' className='water-mark' alt='excel watermark'/>
-                    {this.state.inputFile ? (
-                        <div className='container'>
-                            <p>{this.state.inputFile.name}</p>
-                            <input className='input-field' type='text' placeholder='Enter train number' onChange={(event) => {this.setState({trainNumber: event.target.value})}}/>
-                            <Select ref={this.typeaheadRef} options={options} isMulti className='input-typeahead' onChange={this.stationsChangeHandler}/>
-                            <input className='input-field' type='text' placeholder='Enter arrival dates eg. 26.10.2020, 27.10.2020' onChange={this.dateChangeHandler}/>
-                            <div className='upload-btn-container'>
-                                <button className='upload-btn' onClick={this.submitHandler}>Submit</button>
+                    {this.state.loading ? (
+                        <Spinner animation="border" role="status" style={{ width: '3rem', height: '3rem' }}>
+                            <span className="sr-only">Loading...</span>
+                        </Spinner>
+                    ) : 
+                        this.state.inputFile ? (
+                            <div className='container'>
+                                <p>{this.state.inputFile.name}</p>
+                                <input className='input-field' type='text' placeholder='Enter train number' onChange={(event) => {this.setState({trainNumber: event.target.value})}}/>
+                                <Select ref={this.typeaheadRef} options={options} isMulti className='input-typeahead' onChange={this.stationsChangeHandler}/>
+                                <input className='input-field' type='text' placeholder='Enter arrival dates eg. 26.10.2020, 27.10.2020' onChange={this.dateChangeHandler}/>
+                                <div className='upload-btn-container'>
+                                    <button className='upload-btn' onClick={this.submitHandler}>Submit</button>
+                                </div>
                             </div>
-                        </div>
-                    ) : (
-                        <div>
-                            <label htmlFor='fileUpload' className='upload-btn'>Upload a file</label>
-                            <input id='fileUpload' className='upload-input' type='file' onChange={this.onFileUploadHandler} multiple/>
-                        </div>
-                    )}
+                        ) : (
+                            <div>
+                                <label htmlFor='fileUpload' className='upload-btn'>Upload a file</label>
+                                <input id='fileUpload' className='upload-input' type='file' onChange={this.onFileUploadHandler} multiple/>
+                            </div>
+                        )
+                    }
+                    
                 </div>
             </DragAndDrop>
             
