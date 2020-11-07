@@ -1,3 +1,5 @@
+// "homepage": "http://ShreyasDobhal.github.io/RailwayAutomation",
+
 import React, {Component} from 'react';
 import DragAndDrop from './DragAndDrop';
 import Select from 'react-select'
@@ -5,6 +7,8 @@ import { Spinner } from 'reactstrap';
 
 const ExcelJS = require('exceljs');
 var FileSaver = require('file-saver');
+
+const stationOptions = require('../data.json');
 
 class HomePage extends Component {
 
@@ -16,7 +20,9 @@ class HomePage extends Component {
         stationCodes: [],
         stationDates: [],
 
-        loading: false
+        loading: false,
+
+        isDownloaded: false,
     }
 
     constructor(props) {
@@ -38,7 +44,12 @@ class HomePage extends Component {
         }
         console.log("Uploaded",file.name);
         this.setState({
-            inputFile: file
+            inputFile: file,
+            isDownloaded: false,
+            trainNumber: null,
+            stationNames: [],
+            stationCodes: [],
+            stationDates: []
         });
     }
 
@@ -84,9 +95,29 @@ class HomePage extends Component {
     }
 
     getColumnWidth = (index) => {
-        const width = [14, 14, 14, 14, 14, 14, 14, 21, 14, 14, 14, 14, 14, 14,
-                 14, 27, 14, 14, 28]
+        const width = [7, 14, 14, 10, 10, 10, 10, 21, 14, 28, 10, 14, 18, 18,
+                 14, 27, 14, 14, 120];
         return width[index]
+    }
+
+    getTextMessage = () => {
+
+        let dateMap = {};
+        for (let i = 0; i < this.state.stationDates.length; i++) {
+            let currentDate = this.state.stationDates[i];
+            if (!(currentDate in dateMap))
+                dateMap[currentDate] = [];
+            dateMap[currentDate].push(this.state.stationCodes[i]);
+        }
+
+        let message = '';
+        console.log(dateMap);
+        for (let key in dateMap) {
+            message = message + `LIST OF PASSENGERS DEBOARDING AT *${dateMap[key].join(' ')}* FROM TRAIN NO ${this.state.trainNumber} DATED ${key} 👇 \n`;
+        }
+
+        return message;
+        
     }
 
     createWorkbook = () => {
@@ -174,7 +205,11 @@ class HomePage extends Component {
                 outputWorkbook.xlsx.writeBuffer()
                     .then(buffer => {
                         FileSaver.saveAs(new Blob([buffer]), outputFile);
-                        this.setState({loading: false});
+                        this.setState({
+                            loading: false,
+                            inputFile: null,
+                            isDownloaded: true
+                        });
                     })
                     .catch(err => {
                         console.log('Error writing excel export', err);
@@ -232,52 +267,32 @@ class HomePage extends Component {
         this.createWorkbook();
     }
 
-    render() {
+    copyToClipboard = (text) => {
+        let textField = document.createElement('textarea');
+        textField.innerText = text;
+        document.body.appendChild(textField);
+        textField.select();
+        document.execCommand('copy');
+        textField.remove();
+    }
 
-        const options = [
-            { label: 'BALAMAU', value: 'BLM' },
-            { label: 'HARDOI', value: 'HRI' },
-            { label: 'ANJHI SHAHABAD', value: 'AJI' },
-            { label: 'SHAHJAHANPUR', value: 'SPN' },
-            { label: 'TILHAR', value: 'TLH' },
-            { label: 'PITAMBARPUR', value: 'PMR' },
-            { label: 'BAREILLY', value: 'BE' },
-            { label: 'MILAK', value: 'MIL' },
-            { label: 'RAMPUR', value: 'RMU' },
-            { label: 'MORADABAD', value: 'MB' },
-            { label: 'KANTH', value: 'KNT' },
-            { label: 'SEOHARA', value: 'SEO' },
-            { label: 'DHAMPUR', value: 'DPR' },
-            { label: 'NAGINA', value: 'NGG' },
-            { label: 'NAJIBABAD', value: 'NBD' },
-            { label: 'LAKSAR', value: 'LRJ' },
-            { label: 'ROORKEE', value: 'RK' },
-            { label: 'HARIDWAR', value: 'HW' },
-            { label: 'DEHRADUN', value: 'DDN' },
-            { label: 'DOIWALA', value: 'DWO' },
-            { label: 'GARHMUKTESAR', value: 'GMS' },
-            { label: 'HARRAWALA', value: 'HRW' },
-            { label: 'KANSRAO', value: 'QSR' },
-            { label: 'KOTDWAR', value: 'KTW' },
-            { label: 'RAIWALA', value: 'RWL' },
-            { label: 'CHANDAUSI', value: 'CH' },
-            { label: 'ROZA', value: 'ROZA' },
-            { label: 'GAJRAULA', value: 'GJL' },
-            { label: 'BIJNOR', value: 'BJO' },
-            { label: 'BULANDSHAHR', value: 'BSC' },
-            { label: 'CHANDPUR SIAU', value: 'CPS' },
-            { label: 'RAJA KA SAHASPUR', value: 'RJK' },
-            { label: 'RAJGHAT NARORA', value: 'RG' },
-            { label: 'RISHIKESH', value: 'RKSH' },
-            { label: 'SANDILA', value: 'SAN' },
-            { label: 'PILKHUWA', value: 'PKW' },
-            { label: 'HAPUR', value: 'HPU' },
-            { label: 'AMROHA', value: 'AMRO' }
-        ];
+    handleCopyButton = () => {
+        // Generating text message and copying it
+        const message = this.getTextMessage();
+        // const message = 'Hello World';
+        this.copyToClipboard(message);
+
+        const x = document.getElementById("snackbar");
+        x.className = "show";
+        setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+    render() {
 
         return (
             <DragAndDrop handleDrop={this.handleDrop}>
                 <div className='page-container'>
+                    <div id="snackbar">Message copied !</div>
                     <img src='excel.png' className='water-mark' alt='excel watermark'/>
                     {this.state.loading ? (
                         <Spinner animation="border" role="status" style={{ width: '3rem', height: '3rem' }}>
@@ -285,11 +300,15 @@ class HomePage extends Component {
                         </Spinner>
                     ) : null}
 
+                    {this.state.isDownloaded ? (
+                       <button className='copy-btn' onClick={this.handleCopyButton}>Copy message</button>
+                    ):null}
+
                     {this.state.inputFile ? (
                         <div className='container'>
                             <p>{this.state.inputFile.name}</p>
                             <input className='input-field' type='text' placeholder='Enter train number' onChange={(event) => {this.setState({trainNumber: event.target.value})}}/>
-                            <Select ref={this.typeaheadRef} options={options} isMulti className='input-typeahead' onChange={this.stationsChangeHandler}/>
+                            <Select ref={this.typeaheadRef} options={stationOptions} isMulti className='input-typeahead' onChange={this.stationsChangeHandler}/>
                             <input className='input-field' type='text' placeholder='Enter arrival dates eg. 26.10.2020, 27.10.2020' onChange={this.dateChangeHandler}/>
                             <div className='upload-btn-container'>
                                 <button className='upload-btn' onClick={this.submitHandler}>Submit</button>
@@ -298,9 +317,11 @@ class HomePage extends Component {
                     ) : (
                         <div>
                             <label htmlFor='fileUpload' className='upload-btn'>Upload a file</label>
-                            <input id='fileUpload' className='upload-input' type='file' onChange={this.onFileUploadHandler} multiple/>
+                            <input id='fileUpload' className='upload-input' type='file' accept=".xlsx" onChange={this.onFileUploadHandler} multiple/>
                         </div>
                     )}
+
+                    
                 </div>
             </DragAndDrop>
             
@@ -309,3 +330,9 @@ class HomePage extends Component {
 }
 
 export default HomePage
+
+// LIST OF PASSENGERS DEBOARDING AT BE MB FROM TRAIN NO 012345 DATED 07.11.2020 👇 
+
+// LIST OF PASSENGERS DEBOARDING AT *BE* FROM TRAIN NO 01234 DATED 07.11.2020 👇 LIST OF PASSENGERS DEBOARDING AT *MB* FROM TRAIN NO 01234 DATED 08.11.2020 👇 
+
+//              LIST OF PASSENGERS DEBOARDING AT *BE* FROM TRAIN NO 0123 DATED 07.11.2020 👇             LIST OF PASSENGERS DEBOARDING AT *MB* FROM TRAIN NO 0123 DATED 08.11.2020 👇
