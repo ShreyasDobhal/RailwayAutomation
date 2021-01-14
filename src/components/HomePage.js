@@ -1,4 +1,4 @@
-// "homepage": "http://ShreyasDobhal.github.io/RailwayAutomation",
+
 
 import React, {Component} from 'react';
 import DragAndDrop from './DragAndDrop';
@@ -330,9 +330,3 @@ class HomePage extends Component {
 }
 
 export default HomePage
-
-// LIST OF PASSENGERS DEBOARDING AT BE MB FROM TRAIN NO 012345 DATED 07.11.2020 👇 
-
-// LIST OF PASSENGERS DEBOARDING AT *BE* FROM TRAIN NO 01234 DATED 07.11.2020 👇 LIST OF PASSENGERS DEBOARDING AT *MB* FROM TRAIN NO 01234 DATED 08.11.2020 👇 
-
-//              LIST OF PASSENGERS DEBOARDING AT *BE* FROM TRAIN NO 0123 DATED 07.11.2020 👇             LIST OF PASSENGERS DEBOARDING AT *MB* FROM TRAIN NO 0123 DATED 08.11.2020 👇

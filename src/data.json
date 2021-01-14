@@ -3,6 +3,7 @@
     { "label": "AGHWANPUR", "value": "AWP" },
     { "label": "AIGAWAN", "value": "AIG" },
     { "label": "AITHAL", "value": "ATMO" },
+    { "label": "ALAMNAGAR", "value": "AMG" },
     { "label": "AMHERA", "value": "ARH" },
     { "label": "AMROHA", "value": "AMRO" },
     { "label": "ANJHI SHAHABAD", "value": "AJI" },
@@ -206,5 +207,6 @@
     { "label": "UMAR TALI", "value": "UTA" },
     { "label": "UNCHAULIA", "value": "UCH" },
     { "label": "URDAULI", "value": "UDX" },
-    { "label": "VIRBHADRA", "value": "VRH" }
+    { "label": "VIRBHADRA", "value": "VRH" },
+    { "label": "YOG NAGARI RISHIKESH", "value": "YNRK" }
 ]
